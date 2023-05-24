@@ -15,18 +15,28 @@ def preprocessing(fileImage: UploadFile):
 
 def post_preprocessing(img_postpreprocessing):
     model = load_model('./models/beefy-mobilenetv2.h5')
-    predictions = model.predict(img_postpreprocessing).flatten()
-    predictions = tf.nn.sigmoid(predictions, name='sigmoid')
-    predicted_label = tf.where(predictions < 0.5, 'fresh', 'spoiled').numpy()[0]
-    label_final = bytes.decode(predicted_label, 'utf-8')
-    return label_final
+    predictions = model.predict(img_postpreprocessing)
+    predicted_label = np.argmax(predictions, axis=1)[0]
+    probabilities = tf.reduce_max(predictions, axis=1)
+
+    class_names = ['fresh', 'spoiled']
+    predicted_class = class_names[predicted_label]
+
+    if (predicted_class == 'spoiled'):
+        kesegaran = 100.0 - float(probabilities)*100
+    else:
+        kesegaran = float(probabilities)*100
+
+
+    return predicted_class, "{:.2f}%".format(kesegaran)
 
 def inference(file: UploadFile):
     try:
         image = preprocessing(fileImage=file)
-        label = post_preprocessing(img_postpreprocessing=image)
+        label, level = post_preprocessing(img_postpreprocessing=image)
         responseBody = {
             'label': label,
+            'kesegaran': level
         }
         return True, responseBody
     except:
