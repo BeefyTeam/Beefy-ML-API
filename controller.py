@@ -22,7 +22,13 @@ def post_preprocessing(img_postpreprocessing):
     class_names = ['fresh', 'spoiled']
     predicted_class = class_names[predicted_label]
 
-    return predicted_class, "{:.2f}%".format(float(probabilities)*100)
+    if (predicted_class == 'spoiled'):
+        kesegaran = 100.0 - float(probabilities)*100
+    else:
+        kesegaran = float(probabilities)*100
+
+
+    return predicted_class, "{:.2f}%".format(kesegaran)
 
 def inference(file: UploadFile):
     try:
