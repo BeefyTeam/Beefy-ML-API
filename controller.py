@@ -14,7 +14,7 @@ def preprocessing(fileImage: UploadFile):
     return img_preprocessed
 
 def post_preprocessing(img_postpreprocessing):
-    model = load_model('./models/beefy-mobilenetv2.h5')
+    model = load_model('./models/beefy-1-mobilenetv2.h5')
     predictions = model.predict(img_postpreprocessing)
     predicted_label = np.argmax(predictions, axis=1)[0]
     probabilities = tf.reduce_max(predictions, axis=1)
@@ -23,9 +23,9 @@ def post_preprocessing(img_postpreprocessing):
     predicted_class = class_names[predicted_label]
 
     if (predicted_class == 'spoiled'):
-        kesegaran = 100.0 - float(probabilities)*100
+        kesegaran = 100.0 - float(probabilities)*100.0
     else:
-        kesegaran = float(probabilities)*100
+        kesegaran = float(probabilities)*100.0
 
 
     return predicted_class, "{:.2f}%".format(kesegaran)
