@@ -14,29 +14,39 @@ def preprocessing(fileImage: UploadFile):
     return img_preprocessed
 
 def post_preprocessing(img_postpreprocessing):
-    model = load_model('./models/beefy-1-mobilenetv2.h5')
-    predictions = model.predict(img_postpreprocessing)
-    predicted_label = np.argmax(predictions, axis=1)[0]
-    probabilities = tf.reduce_max(predictions, axis=1)
+    model1 = load_model('models/beefy-1-model.h5')
+    model2 = load_model('models/beefy-1-model.h5')
 
-    class_names = ['fresh', 'spoiled']
-    predicted_class = class_names[predicted_label]
+    predictions1 = model1.predict(img_postpreprocessing)
+    predicted_label1 = np.argmax(predictions1, axis=1)[0]
+    probabilities1 = tf.reduce_max(predictions1, axis=1)
 
-    if (predicted_class == 'spoiled'):
-        kesegaran = 100.0 - float(probabilities)*100.0
+    class_names_model1 = ['fresh', 'spoiled']
+    predicted_class_model1 = class_names_model1[predicted_label1]
+
+    predictions2 = model2.predict(img_postpreprocessing)
+    predicted_label2 = np.argmax(predictions2, axis=1)[0]
+
+    class_names_model2 = ['beef', 'pork']
+    predicted_class_model2 = class_names_model2[predicted_label2]
+
+
+    if (predicted_class_model1 == 'spoiled'):
+        kesegaran = 100.0 - float(probabilities1)*100.0
     else:
-        kesegaran = float(probabilities)*100.0
+        kesegaran = float(probabilities1)*100.0
 
 
-    return predicted_class, "{:.2f}%".format(kesegaran)
+    return predicted_class_model1, "{:.2f}%".format(kesegaran), predicted_class_model2
 
 def inference(file: UploadFile):
     try:
         image = preprocessing(fileImage=file)
-        label, level = post_preprocessing(img_postpreprocessing=image)
+        label, level, type = post_preprocessing(img_postpreprocessing=image)
         responseBody = {
             'label': label,
-            'kesegaran': level
+            'kesegaran': level,
+            'type': type
         }
         return True, responseBody
     except:
