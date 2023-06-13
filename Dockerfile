@@ -10,7 +10,7 @@ RUN pip install -r /code/requirements.txt
 
 RUN pip install python-multipart
 
-pip install "uvicorn[standard]" gunicorn
+RUN pip install "uvicorn[standard]" gunicorn
 
 COPY . /code
 
